@@ -106,7 +106,7 @@ app.post('/add-expense',async function(request,response){
 app.get('/get-expenses',async function(request,response){
     try{
         const expenseData=await Expense.find()
-        express.response.status(200).json(expenseData) //.apply
+        response.status(200).json(expenseData) //.apply
     }catch(error){
         response.status(500).json({
             "status":"failure",

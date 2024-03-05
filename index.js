@@ -62,19 +62,23 @@ const app = express()
 const mongoose = require('mongoose')
 const {Expense} = require('./schema.js')
 const bodyParser = require('body-parser')
+const cors=require('cors')
 app.use(bodyParser.json())
+app.use(cors())
 
 async function connectToDb(){
     
     await mongoose.connect("mongodb+srv://lingeshkumarp2022cse:Seceuse.12@lingesh.bv5r1lm.mongodb.net/ExpenseTracker_FullStack?retryWrites=true&w=majority&appName=Lingesh")
     console.log("DB connection established.")
-const port = 7000
+    const port = process.env.PORT || 7000
+//const port = 7000
 app.listen(port,function(){
     console.log(`Listening... ${port}`)
 })
 }
 connectToDb()
 
+//add
 app.post('/add-expense',async function(request,response){
     try{
         await Expense.create({
@@ -98,6 +102,7 @@ app.post('/add-expense',async function(request,response){
 }
 })
 
+//display(print)
 app.get('/get-expenses',async function(request,response){
     try{
         const expenseData=await Expense.find()
@@ -108,5 +113,41 @@ app.get('/get-expenses',async function(request,response){
             "message":"could not fetch entries",
             "error":error
         })
+    }
+})
+
+//delete
+app.delete('/delete-expense/:id',async function(request,response){
+    console.log("Delete Request received")
+    //console.log(request.params)
+    // try{
+    // if(expenseData){
+    const expenseData = await Expense.findById(request.params.id)
+    console.log(expenseData)
+})
+
+//edit
+app.patch('/edit-expense/:id',async function(request,response){
+    try{
+        const edit=await Expense.findById(request.params.id)
+        if(edit){
+            await Expense.updateOne({
+                "amount":request.body.amount,
+                "category":request.body.category,
+                "date":request.body.date
+            })
+            console.log("Edited")
+            response.status(200).json({
+                "status":"success"
+            })
+        }
+        else{
+            response.status(404).json({
+                "status":"failed"
+            })
+        }
+    }
+    catch(error){
+        console.log("error")
     }
 })
